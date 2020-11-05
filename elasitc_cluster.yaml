@@ -15,8 +15,8 @@
     es_heap_size: "1g"
     es_config:
       cluster.name: "elk-cluster"
-      cluster.initial_master_nodes: "192.168.186.95:9300"
-      discovery.seed_hosts: "192.168.186.95:9300"
+      cluster.initial_master_nodes: "xxxxxx.1:9300"
+      discovery.seed_hosts: "xxxxxx.1:9300"
       http.port: 9200
       node.data: false
       node.master: true
@@ -40,8 +40,8 @@
     es_java_install: true
     es_config:
       cluster.name: "elk-cluster"
-      cluster.initial_master_nodes: "192.168.186.97:9300"
-      discovery.seed_hosts: "192.168.186.97:9300"
+      cluster.initial_master_nodes: "xxxxxx.1:9300"
+      discovery.seed_hosts: "xxxxxx.1:9300"
       http.port: 9200
       node.data: true
       node.master: false
