@@ -1,0 +1,31 @@
+elastic.yml
+- name: install elasticsearch single server
+  hosts: localhost
+  connection: local
+
+  pre_tasks:
+  - name: Insert new arguments a template file
+    lineinfile:
+      dest: /root/.ansible/roles/geerlingguy.elasticsearch/templates/elasticsearch.yml.j2
+      line: '{{ item }}'
+    with_items:
+      - "bootstrap.memory_lock: {{ '{{' }} elasticsearch_bootstrap_memory_lock {{ '}}' }}"
+      - "discovery.type: {{ '{{' }} elasticsearch_discovery_type {{ '}}' }}"
+    become: true
+
+  roles:
+    - geerlingguy.java
+    - geerlingguy.elasticsearch
+  vars:
+    elasticsearch_version: '7.x'
+    elasticsearch_package_state: present
+    elasticsearch_service_state: started
+    elasticsearch_service_enabled: true
+    elasticsearch_network_host: 0.0.0.0
+    elasticsearch_http_port: 9200
+    elasticsearch_heap_size_min: 2g
+    elasticsearch_heap_size_max: 2g
+    elasticsearch_node_name: ${HOSTNAME}
+    #elasticsearch_cluster_name: ${HOSTNAME}-single-cluster
+    elasticsearch_bootstrap_memory_lock: true
+    elasticsearch_discovery_type: single-node
