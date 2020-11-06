@@ -1,0 +1,23 @@
+git add -all
+  590  git add --all.                  >>> yeni eklenen 
+  591  git commit -m "hostname"
+  592  git push origin master
+  593  git branch installation_yamls >>> new branch add
+  595  git add .
+  596  git add --all
+  598  git push origin installation_yamls
+  599  git push origin installation_yamls2
+  602  git checkout installation_yamls
+  604  git add --all
+  605  git commit -m "branch test"
+  606  git push origin installation_yamls
+  607  man git
+  609  git checkout installation_yamls
+  612  git add --all
+  613  git commit -m "tek dosya test installation yaml"
+  614  git push origin installation_yamls
+  616  git checkout master
+
+git push origin --delete test >> test branch i silinir 
+
+git push origin --delete test
