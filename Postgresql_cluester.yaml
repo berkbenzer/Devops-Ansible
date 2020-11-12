@@ -1,0 +1,77 @@
+
+##ansible-galaxy collection install community.general
+##community.general.postgresql_user
+
+- name: postgresql installation
+  become: yes
+  remote_user: root
+  hosts: postgre
+  tasks:
+    - name: yum update all package
+      yum: name={{ item }} state=present
+      with_items:
+          - postgresql*
+
+    - name: postgre initdb
+      shell: "{{ item }}"
+      with_items:
+          - service postgresql initdb
+          - systemctl restart postgresql.service
+
+ 
+    - name: cluster Master configuration
+      shell: "{{ item }}"
+      with_items:
+	  - cp /var/lib/pgsql/data/postgresql.conf /var/lib/pgsql/data/postgresql.conf_bak
+	  - echo "wal_level=hot_standby" >> /var/lib/pgsql/data/postgresql.conf
+	  - echo "synchronous_commit = local" >> /var/lib/pgsql/data/postgresql.conf
+	  - echo "archive_mode = on" >> /var/lib/pgsql/data/postgresql.conf
+	  - echo "archive_command = 'cp %p /var/lib/pgsql/archive/%f'" >> /var/lib/pgsql/data/postgresql.conf
+	  - echo "max_wal_senders = 2" >> /var/lib/pgsql/data/postgresql.conf
+	  - echo "wal_keep_segments = 10" >> /var/lib/pgsql/data/postgresql.con
+	  - mkdir -p /var/lib/pgsql/archive
+	  - chown -R postgres /var/lib/pgsql/archive/ 
+	  - ip_ad_cl=$(ifconfig | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" | grep -v 255* | grep -v 127.0.0.1)
+	  - echo "listen_addresses = $ip_ad_cl >> /var/lib/pgsql/data/postgresql.conf
+	  - echo "# PostgreSQL Master IP address" >> postgresql.conf
+	  - echo " host    replication     replica          $ip_ad_cl            trust" >> /var/lib/pgsql/data/postgresql.conf
+          - echo "# PostgreSQL Slave IP address" >> var/lib/pgsql/data/postgresql.conf
+	  - echo " host    replication     replica       'Slave IP adress need written'    trust"  >> /var/lib/pgsql/data/postgresql.conf
+ 	  - systemctl restart postgresql.service         
+          ## Manuel entry, connect to master run
+	  ## su - postgres
+	  ## createuser --replication -P replica
+- hosts: postre_slave
+  remote_user: root
+  become: yes
+  tasks: 
+    - name: yum update all package
+      yum: name={{ item }} state=present
+      with_items:
+          - postgresql*
+    
+    - name: cluster Slave configuration
+      shell: "{{ item }}"
+      with_items:
+          - systemctl stop postgresql.service
+	  - cd /var/lib/pgsql/data/
+	  - mv /var/lib/pgsql/data/ /var/lib/pgsql/data_bck
+	  - mkdir -p data/
+	  - chmod 700 data/
+	  - chown -R postgres:postgres data/
+	  - su - postgres
+	  - pg_basebackup -h "Master Node IP" -U replica -D  /var/lib/pgsql/data/ -P
+          - cd /var/lib/pgsql/data
+	  - ip_ad_cl=$(ifconfig | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" | grep -v 255* | grep -v 127.0.0.1)
+	  - echo "listen_addresses = " $ip_ad_cl " >> postgresql.conf
+	  - echo  "hot_standby = on" >> postgresql.conf
+          - touch /var/lib/pgsql/data/recovery.conf
+          - chown postgres:postgres /var/lib/pgsql/data/recovery.conf
+          - echo "standby_mode = 'on'" >> /var/lib/pgsql/data/recovery.conf
+	  - echo "primary_conninfo = 'host= $ip_ad_cl port=5432 user=replica   application_name=pgslave01'
+trigger_file = '/tmp/postgresql.trigger.5432'" >> /var/lib/pgsql/data/recovery.conf
+          - chmod 600 /var/lib/pgsql/data/recovery.conf
+	  - chown postgres:postgres /var/lib/pgsql/data/recovery.conf
+          - systemctl start postgresql.service
+
+
