@@ -1,0 +1,28 @@
+---
+
+- name: mongodb installation
+  become: yes
+  remote_user: root
+  hosts: postgremaster
+  tasks:
+
+        - name: Add multiple repositories into the same file (1/2)
+          yum_repository:
+            name: mongodb
+            description: Mongo YUM repo
+            baseurl: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.2/x86_64/
+            gpgcheck: yes
+            gpgkey: https://www.mongodb.org/static/pgp/server-4.2.asc
+            enabled: yes
+
+        - name: install mongodb
+          yum: name=mongodb-org state=present
+
+
+        - name: start mongodb
+          shell: "{{ item }}"
+          with_items:
+              - systemctl start mongod
+              - systemctl daemon-reload
+              - systemctl enable mongod
+[odeonuser@centralmanangement managemen
