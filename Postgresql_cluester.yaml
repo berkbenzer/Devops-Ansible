@@ -39,9 +39,9 @@
           - echo # Localhost >> /var/lib/pgsql/data/pg_hba.conf
           - echo  "host    replication     replica          127.0.0.1/32        trust" >> /var/lib/pgsql/data/pg_hba.conf
           - echo "# PostgreSQL Master IP address" >> /var/lib/pgsql/data/pg_hba.conf
-          - echo " host    replication     replica        192.168.186.97/32     trust" >> /var/lib/pgsql/data/pg_hba.conf
+          - echo " host    replication     replica        MasterNodeIP/32     trust" >> /var/lib/pgsql/data/pg_hba.conf
           - echo "# PostgreSQL Slave IP address" >> /var/lib/pgsql/data/pg_hba.conf
-          - echo " host    replication     replica       192.168.186.95/32    trust"  >> /var/lib/pgsql/data/pg_hba.conf
+          - echo " host    replication     replica       SlaveNodeIP/32    trust"  >> /var/lib/pgsql/data/pg_hba.conf
           - echo " local all replica trust" >> /var/lib/pgsql/data/pg_hba.conf
           - systemctl restart postgresql.service
           
@@ -69,14 +69,14 @@
           - mkdir -p data/
           - chmod 700 data
           - chown -R postgres:postgres data/
-          - runuser -l postgres -c 'pg_basebackup -h 192.168.186.97 -U replica -D  /var/lib/pgsql/data/ -P'
+          - runuser -l postgres -c 'pg_basebackup -h MASTERNODIP -U replica -D  /var/lib/pgsql/data/ -P'
           - cd /var/lib/pgsql/data
           - echo  "hot_standby = on" >> /var/lib/pgsql/data/postgresql.conf
-          - sed -i 's/192.168.186.97/192.168.186.95/g' /var/lib/pgsql/data/postgresql.conf
+          - sed -i 's/MASTERNODE/SLAVENODE/g' /var/lib/pgsql/data/postgresql.conf
           - touch /var/lib/pgsql/data/recovery.conf
           - chown postgres:postgres /var/lib/pgsql/data/recovery.conf
           - echo "standby_mode = 'on'" >> /var/lib/pgsql/data/recovery.conf
-          - echo "primary_conninfo = 'host= 192.168.186.97 port=5432 user=replica password=qwe123  application_name=pgslave01'" >> /var/lib/pgsql/data/recovery.conf
+          - echo "primary_conninfo = 'host= MASTERNODE port=5432 user=replica password=qwe123  application_name=pgslave01'" >> /var/lib/pgsql/data/recovery.conf
           - echo "trigger_file = '/tmp/postgresql.trigger.5432'" >> /var/lib/pgsql/data/recovery.conf
           - chmod 600 /var/lib/pgsql/data/recovery.conf
           - chown postgres:postgres /var/lib/pgsql/data/recovery.conf
