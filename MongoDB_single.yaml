@@ -25,4 +25,3 @@
               - systemctl start mongod
               - systemctl daemon-reload
               - systemctl enable mongod
-[odeonuser@centralmanangement managemen
