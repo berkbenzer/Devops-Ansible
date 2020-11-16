@@ -1,0 +1,25 @@
+---
+
+- name: redis install
+  remote_user: root
+  become: yes
+  hosts: rabbitmq
+  tasks:
+        - name: yum upgrade all package
+          yum: name=* state=latest
+
+        - name: yum install redis
+          yum: name=redis state=latest
+
+  roles:
+   - davidwittman.redis
+  vars:
+    redis_bind: 0.0.0.0
+    redis_daemonize: "yes"
+    redis_loglevel: notice
+    redis_maxmemory: false
+    redis_maxmemory_policy: noeviction
+    redis_logfile: /var/log/redis.log
+    redis_syslog_enabled: "yes"
+    redis_syslog_ident: "{{ redis_service_name }}"
+    redis_syslog_facility: LOCAL0
