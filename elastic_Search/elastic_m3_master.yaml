@@ -1,0 +1,19 @@
+- hosts: redis
+  become: true
+  become_user: root
+  roles:
+    - role: elastic.elasticsearch
+  vars:
+    es_heap_size: "1g"
+    es_config:
+      cluster.name: "test-cluster"
+      cluster.initial_master_nodes: 192.168.11, 192.168.22, 192.168.33
+      discovery.seed_hosts: 192.168.11, 192.168.22, 192.168.33
+      http.port: 9200
+      node.name: MASTERHOSTNAME
+      network.host: 0.0.0.0
+      node.data: false
+      node.master: true
+      bootstrap.memory_lock: false
+    es_plugins:
+     - plugin: ingest-attachment
