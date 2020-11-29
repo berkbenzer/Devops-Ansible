@@ -4,8 +4,6 @@ provider "aws" {
   secret_key = XXXXX
 }
 
-
-
 resource "aws_default_vpc" "default" {}
 
 resource "aws_default_subnet" "default_az1" {
@@ -30,27 +28,28 @@ resource "aws_security_group" "nginx_prod" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["1000000"]
   }
   ingress{
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["1000000"]
   }
   egress{
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+    cidr_blocks = ["1000000"]
+ }
   tags = {
     "Terraform" : "true"
   }
 }
 resource "aws_instance" "prod_web_nginx" {
   count         = 2
-  ami           = "ami-XXXXX"
+
+  ami           = "ami-XXXXXXX"
   instance_type = "t2.nano"
 
   vpc_security_group_ids = [
@@ -63,12 +62,13 @@ resource "aws_instance" "prod_web_nginx" {
 }
 
 resource "aws_eip_association" "prod_web_nginx" {
+  count = 2
   instance_id   = aws_instance.prod_web_nginx.0.id
-  allocation_id = aws_eip.prod_web_nginx.id
+  allocation_id = aws_eip.prod_web_nginx.0.id
 }
 
 resource "aws_eip" "prod_web_nginx"{
-
+  count = 2
   instance = aws_instance.prod_web_nginx.0.id
 
   tags = {
@@ -93,3 +93,4 @@ resource "aws_elb" "prod_web_nginx" {
     "Terraform" : "true"
   }
 }
+
