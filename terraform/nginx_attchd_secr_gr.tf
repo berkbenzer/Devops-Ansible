@@ -1,3 +1,7 @@
+### this script creates nginx server that attached to the security group created down below.
+### In order to find th public IP address of the nginx server after the creation need to run "terraform show"
+
+
 provider "aws" {
   region     = "us-west-2"
   access_key = "XXXXXXXX"
