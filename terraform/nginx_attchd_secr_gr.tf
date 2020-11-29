@@ -48,4 +48,14 @@ resource "aws_instance" "prod_web_nginx" {
   }
 }
 
+### will configure static ip address
+resource "aws_eip" "prod_web_nginx"{
+
+  instance = aws_instance.prod_web_nginx.id
+
+  tags = {
+    "Terraform" : "true"
+  }
+}
+
 
