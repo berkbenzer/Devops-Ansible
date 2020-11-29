@@ -49,6 +49,7 @@ resource "aws_security_group" "nginx_prod" {
   }
 }
 resource "aws_instance" "prod_web_nginx" {
+  count         = 2
   ami           = "ami-XXXXX"
   instance_type = "t2.nano"
 
@@ -62,13 +63,13 @@ resource "aws_instance" "prod_web_nginx" {
 }
 
 resource "aws_eip_association" "prod_web_nginx" {
-  instance_id   = aws_instance.prod_web_nginx.id
+  instance_id   = aws_instance.prod_web_nginx.0.id
   allocation_id = aws_eip.prod_web_nginx.id
 }
 
 resource "aws_eip" "prod_web_nginx"{
 
-  instance = aws_instance.prod_web_nginx.id
+  instance = aws_instance.prod_web_nginx.0.id
 
   tags = {
     "Terraform" : "true"
