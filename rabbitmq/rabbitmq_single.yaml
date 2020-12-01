@@ -1,0 +1,31 @@
+- name: Install Rabbitmq Single Server
+  hosts: rabbit
+
+  roles:
+    - tanadeau.ansible_role_rabbitmq
+  vars:
+    - rabbitmq_version: "3.8.9"
+    - rabbitmq_daemon: rabbitmq-server
+    - rabbitmq_state: started
+    - rabbitmq_enabled: true
+
+  post_tasks:
+  - rabbitmq_vhost:
+      name: test
+      state: present
+
+
+  - rabbitmq_user:
+      user: admin
+      password: admin
+      tags: administrator
+      permissions:
+        - vhost: "test"
+          configure_priv: .*
+          read_priv: .*
+          write_priv: .*
+      state: present
+
+  - rabbitmq_plugin:
+      names: rabbitmq_management,rabbitmq_management_visualiser
+      state: enabled
