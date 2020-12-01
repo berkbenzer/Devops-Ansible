@@ -1,0 +1,48 @@
+- hosts: rabbitmq-master
+  become: true
+  become_user: root
+  roles:
+    - role: rockandska.erlang
+    - role: rockandska.rabbitmq
+      vars:
+        rabbitmq_is_master: true
+        rabbitmq_users_to_delete:
+          - guest
+        rabbitmq_vhosts_to_create:
+          - name: vhost_test
+        rabbitmq_users_to_create:
+          - user: admin
+            password: admin
+            vhost: vhost_test
+            configure_priv: .*
+            read_priv: .*
+            write_priv: .*
+            tags: administrator
+        rabbitmq_plugins_to_enable:
+          - rabbitmq_management
+          - rabbitmq_shovel
+
+
+- hosts: rabbitmq-slave
+  become: true
+  become_user: root
+  roles:
+    - role: rockandska.erlang
+    - role: rockandska.rabbitmq
+      vars:
+        rabbitmq_slave_of: IP ADRESS
+        rabbitmq_users_to_delete:
+          - guest
+        rabbitmq_vhosts_to_create:
+          - name: vhost_test
+        rabbitmq_users_to_create:
+          - user: admin
+            password: admin
+            vhost: vhost_test
+            configure_priv: .*
+            read_priv: .*
+            write_priv: .*
+            tags: administrator
+        rabbitmq_plugins_to_enable:
+          - rabbitmq_management
+          - rabbitmq_shovel
