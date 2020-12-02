@@ -10,3 +10,13 @@
              - atop
              - psacct
            state: present
+
+       - name: Enable Atop
+         service:
+           name: atop
+           enabled: yes
+
+       - name: Enable Start
+         service:
+           name: psacct
+           state: started
