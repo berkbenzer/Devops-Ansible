@@ -16,7 +16,18 @@
            name: atop
            enabled: yes
 
-       - name: Enable Start
+       - name: Enable Psacct
+         service:
+           name: psacct
+           enabled: yes
+
+
+       - name: PSACCT Start
+         service:
+           name: psacct
+           state: started
+       
+       - name: Atop Start
          service:
            name: psacct
            state: started
