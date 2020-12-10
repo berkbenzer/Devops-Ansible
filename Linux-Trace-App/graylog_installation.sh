@@ -1,3 +1,6 @@
+yum update -y
+init 6
+
 dnf install -y wget pwgen perl-Digest-SHA
 
 dnf install -y java-1.8.0-openjdk-headless
