@@ -104,3 +104,18 @@ systemctl restart graylog-server
 systemctl enable graylog-server
 
 
+yum install rsysylog -y
+
+systemctl enable rsyslog
+systemctl start rsyslog
+
+vi /etc/rsyslog.d/90-graylog.conf
+
+*.* @IPADRESSOF GRAYLOGSERVER:5140;RSYSLOG_SyslogProtocol23Format
+
+
+
+
+
+
+
