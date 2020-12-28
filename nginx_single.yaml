@@ -1,0 +1,23 @@
+---
+- hosts: kibana
+  become: true
+  become_user: root
+  collections:
+    - nginxinc.nginx_controller
+
+  roles:
+  - role: nginx
+      vars:
+      nginx_enable: true
+      nginx_start: true
+      nginx_type: plus
+
+  - role: nginx_controller_generate_token
+      vars:
+        nginx_controller_fqdn: xxxxx
+        nginx_controller_user_email: xxxx@sdfsfd.com
+        nginx_controller_user_password: xxxxx
+
+  - role: nginx_controller_agent
+      vars:
+        nginx_controller_fqdn: xxxxx
