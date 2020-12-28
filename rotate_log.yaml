@@ -1,0 +1,22 @@
+---
+
+- hosts: redis
+  become: true
+  become_user: root
+  tasks:
+    - name: rotate logs
+      shell: "{{ item }}"
+      with_items:
+          - find / -name rabbit*log*.gz -exec tar -cvf /tmp/rabbit.tar.gz {} \;
+          - find / -name redis.log-*.gz -exec tar -cvf /tmp/reddis.tar.gz {} \;
+          - find / -name elasticsearc*log*.gz -exec tar -cvf /tmp/elastic.tar.gz {} \;
+          - find / -name access.log*.gz -exec tar -cvf /tmp/nginx_access.tar.gz {} \;
+          - find / -name error.log*.gz -exec tar -cvf /tmp/nginx_error.tar.gz {} \;
+
+    - name: move log files tmp
+      fetch:
+        src: /tmp/ {{ item }}
+        dest: /tmp/
+        flat: yes
+      with_items:
+        ['rabbit.tar.gz','reddis.tar.gz','elastic.tar.gz','nginx_access.tar.gz','nginx_error.tar.gz']  
