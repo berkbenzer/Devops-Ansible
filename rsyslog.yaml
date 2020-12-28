@@ -1,0 +1,18 @@
+---
+
+- hosts: newhosts
+  become: true
+  become_user: root
+  tasks:
+       - name: Rsyslog Installation
+         yum:
+           name:
+             - rsyslog
+           state: present
+       - name: Ryslog Configuration
+         shell: "{{ item }}"
+         with_items:
+             - touch /etc/rsyslog.d/90-graylog.conf
+             - echo "*.* @192.11.11.11:5140;RSYSLOG_SyslogProtocol23Format" > /etc/rsyslog.d/90-graylog.conf
+             - systemctl restart rsyslog.service
+
