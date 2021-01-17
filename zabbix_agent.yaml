@@ -1,0 +1,17 @@
+---
+
+- hosts: zabbix_agent_prod
+  become: true
+  become_user: root
+  tasks:
+        - name: cluster Master configuration
+          shell: "{{ item }}"
+          with_items:
+              - rpm -ivh https://repo.zabbix.com/zabbix/4.4/rhel/7/x86_64/zabbix-agent-4.4.7-1.el7.x86_64.rpm
+              - sed -i 's/Server=127.0.0.1/Server=xxx.net/g' /etc/zabbix/zabbix_agentd.conf
+              - sed -i 's/ServerActive=127.0.0.1/ServerActive=xxx.net/g' /etc/zabbix/zabbix_agentd.conf
+              - sed -i "s/Hostname=Zabbix server/Hostname=`hostname -f`/g"  /etc/zabbix/zabbix_agentd.conf
+              - sed -i 's/XXXX/xxxx/g' /etc/zabbix/zabbix_agentd.conf
+              - systemctl restart zabbix-agent
+              - systemctl enable zabbix-agent
+              - systemctl status zabbix-agent
