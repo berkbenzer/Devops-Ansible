@@ -4,7 +4,7 @@
   become: true
   become_user: root
   tasks:
-        - name: cluster Master configuration
+        - name: Zabbix Agent Configuration
           shell: "{{ item }}"
           with_items:
               - rpm -ivh https://repo.zabbix.com/zabbix/4.4/rhel/7/x86_64/zabbix-agent-4.4.7-1.el7.x86_64.rpm
@@ -15,3 +15,16 @@
               - systemctl restart zabbix-agent
               - systemctl enable zabbix-agent
               - systemctl status zabbix-agent
+
+
+
+
+- hosts: test
+  become: true
+  become_user: root
+
+  tasks:
+    - replace:
+        path: /etc/zabbix/zabbix_agentd.conf
+        regexp: Zabbix server
+        replace: "{{ ansible_hostname }}"
