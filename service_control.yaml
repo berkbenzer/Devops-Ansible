@@ -1,0 +1,14 @@
+---
+
+- hosts: zabbix_agent_control
+  become: true
+  become_user: root
+  tasks:
+        - name: get zabbix service facts
+          service_facts:
+
+        - name: check if zabbix installed
+          fail:
+            msg: Zabbix is not installed
+          when: ansible_facts.services["zabbix-agent.service"] is not defined
+~
