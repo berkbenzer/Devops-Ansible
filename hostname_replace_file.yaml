@@ -1,0 +1,9 @@
+- hosts: test
+  become: true
+  become_user: root
+
+  tasks:
+    - replace:
+        path: /file
+        regexp: test
+        replace: "{{ ansible_hostname }}"
