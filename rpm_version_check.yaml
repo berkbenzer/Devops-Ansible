@@ -1,0 +1,18 @@
+---
+
+- hosts: sudo_hosts
+  become: true
+  become_user: root
+  tasks:
+    - name: Gather the package facts
+      package_facts:
+        manager: rpm
+
+    - name: Print the package facts
+      debug:
+        var: ansible_facts.rpm
+
+    - name: Check whether a package called sudo is installed
+      debug:
+        msg: "{{ ansible_facts.packages['sudo']  }} versions of sudo are installed!"
+      when: "'sudo' in ansible_facts.packages"
