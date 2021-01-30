@@ -8,9 +8,6 @@
       package_facts:
         manager: rpm
 
-    - name: Print the package facts
-      debug:
-        var: ansible_facts.rpm
 
     - name: Check whether a package called sudo is installed
       debug:
