@@ -1,0 +1,62 @@
+---
+
+- name: Active Diroctry Intagration
+  hosts: ad_int
+  become: true
+  become_user: root
+  tasks:
+
+    - name: Install AD packages
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - sssd
+          - realmd
+          - oddjob
+          - oddjob-mkhomedir
+          - adcli
+          - samba-common
+          - samba-common-tools
+          - krb5-workstation
+          - openldap-clients
+          - policycoreutils-python
+
+    - name: Backup orj sssd.conf
+      shell: "{{ item }}"
+      with_items:
+        - cp /etc/sssd./conf.d/sssd.conf /etc/sssd./conf.d/sssd.conf_bak
+        - vi /etc/sssd./conf.d/sssd.conf
+
+    - name: Transfering the sssd.conf file from conf_files direcotry
+      copy:
+        src: /home/odeonuser/scripts/yaml/conf_files/sssd.conf
+        dest: /etc/sssd/conf.d/
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Hostname Configuration
+      shell: "{{ item }}"
+      with_items:
+        -
+        - hostnamectl set-hostname $HOSTNAME.XXdomain.net
+        - sed -i 's/XXXX/XXdomain.net/g' /etc/sysconfig/network-scripts/ifcfg-ens160
+        - systemctl restart NetworkManager
+
+
+    - name: install pexpect using pip
+      pip:
+        name: pexpect
+
+    - name: Realm Join
+      expect:
+        command: echo 11111 | realm join --user=xxxuser --computer-ou=OU=Linux,OU=Test,OU=Servers XXdomain.net
+        responses:
+          Password for *: "1Q2w3e.."
+
+    - name: Start sssd service
+      ansible.builtin.service:
+        name: sssd
+        state: started
+        enabled: yes
