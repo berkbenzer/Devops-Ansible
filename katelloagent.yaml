@@ -1,0 +1,22 @@
+---
+
+- hosts: sudo_hosts
+  become: true
+  become_user: root
+  tasks:
+    - name: katello-integration Centos7 Prod
+      shell: "{{ item }}"
+      with_items:
+        - subscription-manager unregister
+        - subscription-manager remove --all
+        - yum update -y
+        - echo xxxx   xxxxxx.workgroup xxxxx >> /etc/hosts
+        - echo xxxx   xxxxxx.workgroup xxxxx >> /etc/hosts
+        - yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        - yum -y install -y https://yum.theforeman.org/client/2.0/el7/x86_64/foreman-client-release.rpm
+        - yum -y install katello-host-tools
+        - yum -y install katello-agent
+        - yum -y install subscription-manager
+        - yum -y install http://KATELLO_PROD/pub/katello-ca-consumer-latest.noarch.rpm
+        - subscription-manager register --org="XXXXX" --activationkey="XXXXX"
+        - systemctl restart goferd.service
