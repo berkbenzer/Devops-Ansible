@@ -1,0 +1,59 @@
+---
+
+- hosts: postgre_rsa
+  become: true
+  become_user: root
+  vars:
+    users:
+    - username: "user1"
+    - username: "user2"
+    - username: "user3"
+    - username: "user3"
+    - username: "user4"
+
+  tasks:
+
+    - name : create users
+      ansible.builtin.user:
+        name: "{{ item.username }}"
+        shell: /bin/bash
+      with_items: "{{ users }}"
+
+    - name : Create .ssh folder
+      file:
+        path: /home/{{ item.username  }}/.ssh
+        state: directory
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: 0700
+      with_items: "{{ users }}"
+
+    - name: Transfer authorized_keys into the .ssh folder
+      ansible.builtin.copy:
+        src:  /home/ansible/scripts/yaml/postgre/users/{{ item.username  }}/authorized_keys
+        dest: /home/{{ item.username }}/.ssh/
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: 0600
+      with_items: "{{ users }}"
+
+    - name: Giving write permission to /etc/sudoers file
+      shell: "{{ item }}"
+      with_items:
+          - chmod +w /etc/sudoers
+
+    - name: Adding user {{ user }} to wheel sudo group
+      user:
+        name: "{{ item.username }}"
+        groups: "{{ item.username }}"
+        append: yes
+      with_items: "{{ users }}"
+
+
+    - name: Allow 'wheel' group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        line: '{{ item.username }} ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+      with_items: "{{ users }}"
