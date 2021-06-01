@@ -1,62 +1,58 @@
 ---
 
-- name: Active Diroctry Intagration
-  hosts: ad_int
+- hosts: postgre_rsa
   become: true
   become_user: root
+  vars:
+    users:
+    - username: "x1"
+    - username: "x2"
+    - username: "x3"
+    - username: "x4"
+    - username: "x5"
+
   tasks:
 
-    - name: Install AD packages
-      yum:
-        name: "{{ packages }}"
-      vars:
-        packages:
-          - sssd
-          - realmd
-          - oddjob
-          - oddjob-mkhomedir
-          - adcli
-          - samba-common
-          - samba-common-tools
-          - krb5-workstation
-          - openldap-clients
-          - policycoreutils-python
+    - name : create users
+      ansible.builtin.user:
+        name: "{{ item.username }}"
+        shell: /bin/bash
+      with_items: "{{ users }}"
 
-    - name: Backup orj sssd.conf
+    - name : Create .ssh folder
+      file:
+        path: /home/{{ item.username  }}/.ssh
+        state: directory
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: 0700
+      with_items: "{{ users }}"
+
+    - name: Transfer authorized_keys into the .ssh folder
+      ansible.builtin.copy:
+        src:  /home/USER_RSA/scripts/yaml/postgre/users/{{ item.username  }}/authorized_keys
+        dest: /home/{{ item.username }}/.ssh/
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: 0600
+      with_items: "{{ users }}"
+
+    - name: Giving write permission to /etc/sudoers file
       shell: "{{ item }}"
       with_items:
-        - cp /etc/sssd./conf.d/sssd.conf /etc/sssd./conf.d/sssd.conf_bak
-        - vi /etc/sssd./conf.d/sssd.conf
+          - chmod +w /etc/sudoers
 
-    - name: Transfering the sssd.conf file from conf_files direcotry
-      copy:
-        src: /home/odeonuser/scripts/yaml/conf_files/sssd.conf
-        dest: /etc/sssd/conf.d/
-        owner: root
-        group: root
-        mode: 0644
-
-    - name: Hostname Configuration
-      shell: "{{ item }}"
-      with_items:
-        -
-        - hostnamectl set-hostname $HOSTNAME.XXdomain.net
-        - sed -i 's/XXXX/XXdomain.net/g' /etc/sysconfig/network-scripts/ifcfg-ens160
-        - systemctl restart NetworkManager
+    - name: Adding user {{ user }} to wheel sudo group
+      user:
+        name: "{{ item.username }}"
+        groups: wheel
+        append: yes
+      with_items: "{{ users }}"
 
 
-    - name: install pexpect using pip
-      pip:
-        name: pexpect
-
-    - name: Realm Join
-      expect:
-        command: echo 11111 | realm join --user=xxxuser --computer-ou=OU=Linux,OU=Test,OU=Servers XXdomain.net
-        responses:
-          Password for *: "1Q2w3e.."
-
-    - name: Start sssd service
-      ansible.builtin.service:
-        name: sssd
-        state: started
-        enabled: yes
+    - name: Allow 'wheel' group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
