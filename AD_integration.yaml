@@ -1,59 +1,73 @@
----
-
-- hosts: postgre_rsa
-  become: true
+- name: Install and configure AD authentication
+  hosts: ad_int
+  become: yes
   become_user: root
-  vars:
-    users:
-    - username: "x1"
-    - username: "x2"
-    - username: "x3"
-    - username: "x4"
-    - username: "x5"
 
   tasks:
+    - name: Install ad_auth required tools
+      yum:
+        name:
+          - libselinux-python
+          - realmd
+          - sssd
+          - oddjob
+          - oddjob-mkhomedir
+          - adcli
+          - samba-common
+          - samba-common-tools
+          - ntpdate
+          - ntp
+          - oddjob-mkhomedir
+          - oddjob
+          - samba-common-tools
 
-    - name : create users
-      ansible.builtin.user:
-        name: "{{ item.username }}"
-        shell: /bin/bash
-      with_items: "{{ users }}"
-
-    - name : Create .ssh folder
-      file:
-        path: /home/{{ item.username  }}/.ssh
-        state: directory
-        owner: "{{ item.username }}"
-        group: "{{ item.username }}"
-        mode: 0700
-      with_items: "{{ users }}"
-
-    - name: Transfer authorized_keys into the .ssh folder
-      ansible.builtin.copy:
-        src:  /home/odeonuser/scripts/yaml/postgre/users/{{ item.username  }}/authorized_keys
-        dest: /home/{{ item.username }}/.ssh/
-        owner: "{{ item.username }}"
-        group: "{{ item.username }}"
-        mode: 0600
-      with_items: "{{ users }}"
-
-    - name: Giving write permission to /etc/sudoers file
-      shell: "{{ item }}"
-      with_items:
-          - chmod +w /etc/sudoers
-
-    - name: Adding user {{ user }} sudo group
-      user:
-        name: "{{ item.username }}"
-        groups: "{{ item.username }}"
-        append: yes
-      with_items: "{{ users }}"
-
-
-    - name: Allow users to have passwordless sudo
-      lineinfile:
-        dest: /etc/sudoers
+    - lineinfile:
+        path: /etc/sudoers
         state: present
-        line: '{{ item.username }} ALL=(ALL) NOPASSWD: ALL'
-        validate: 'visudo -cf %s'
-      with_items: "{{ users }}"
+        regexp: '^%sudo'
+        line: " {{ item }}"
+      with_items:
+        - "{{'%ADMGROUP@xxdomain.net ALL=(ALL) NOPASSWD: ALL'}}"
+
+
+    - name: create directory if they don't exist
+      file:
+        path: "{{ path }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0775
+      loop:
+        - /etc/sssd
+      loop_control:
+        loop_var: path
+
+    - name: create directory if they don't exist
+      file:
+        path: "{{ secondpath }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0775
+      loop:
+        - /etc/sssd/conf.d
+      loop_control:
+        loop_var: secondpath
+
+    - name: transfer sssd.conf to servers
+      ansible.builtin.copy:
+        src: /home/xxx/scripts/yaml/AD/domains/XXDOMAIN/sssd.conf
+        dest: "{{ sssd_conf }}"
+        owner: root
+        group: root
+        mode: 700
+      loop:
+        - /etc/sssd/conf.d
+        - /etc/sssd/
+      loop_control:
+        loop_var: sssd_conf
+
+    - name: Install ad_auth required tools
+      shell: echo "password" | realm join --user="username" --computer-ou=OU=Linux,OU=Test,OU=Servers xxdomain.net
+
+
