@@ -30,7 +30,7 @@
 
     - name: Transfer authorized_keys into the .ssh folder
       ansible.builtin.copy:
-        src:  /home/USER_RSA/scripts/yaml/postgre/users/{{ item.username  }}/authorized_keys
+        src:  /home/odeonuser/scripts/yaml/postgre/users/{{ item.username  }}/authorized_keys
         dest: /home/{{ item.username }}/.ssh/
         owner: "{{ item.username }}"
         group: "{{ item.username }}"
@@ -45,7 +45,7 @@
     - name: Adding user {{ user }} to wheel sudo group
       user:
         name: "{{ item.username }}"
-        groups: wheel
+        groups: "{{ item.username }}"
         append: yes
       with_items: "{{ users }}"
 
@@ -54,5 +54,6 @@
       lineinfile:
         dest: /etc/sudoers
         state: present
-        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        line: '{{ item.username }} ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
+      with_items: "{{ users }}"
