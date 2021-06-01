@@ -42,7 +42,7 @@
       with_items:
           - chmod +w /etc/sudoers
 
-    - name: Adding user {{ user }} to wheel sudo group
+    - name: Adding user {{ user }} sudo group
       user:
         name: "{{ item.username }}"
         groups: "{{ item.username }}"
@@ -50,7 +50,7 @@
       with_items: "{{ users }}"
 
 
-    - name: Allow 'wheel' group to have passwordless sudo
+    - name: Allow users to have passwordless sudo
       lineinfile:
         dest: /etc/sudoers
         state: present
