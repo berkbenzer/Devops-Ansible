@@ -1,0 +1,35 @@
+---
+
+- hosts: rsa_control
+  become: true
+  become_user: root
+  vars:
+    users:
+    - username: "username"
+
+  tasks:
+
+    - name: Check If RSA key exist
+      stat:
+        path: /home/username/.ssh/authorized_keys
+      register: rsa_key
+
+    - name : Create .ssh folder
+      file:
+        path: /home/{{ item.username  }}/.ssh
+        state: directory
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: 0700
+      with_items: "{{ users }}"
+      when: rsa_key.stat.exists == False
+
+    - name: Transfer authorized_keys into the .ssh folder
+      ansible.builtin.copy:
+        src:  /home/username/scripts/yaml/postgre/users/{{ item.username  }}/authorized_keys
+        dest: /home/{{ item.username }}/.ssh/
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: 0600
+      with_items: "{{ users }}"
+      when: rsa_key.stat.exists == False
