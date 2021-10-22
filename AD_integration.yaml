@@ -87,6 +87,6 @@
     - name: Delete .sh folder & File
       file:
         state: absent
-        path: /home/odeonuser/.sh/
+        path: /home/user/.sh/
      
 
