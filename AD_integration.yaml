@@ -68,6 +68,25 @@
         loop_var: sssd_conf
 
     - name: Install ad_auth required tools
-      shell: echo "password" | realm join --user="username" --computer-ou=OU=Linux,OU=Test,OU=Servers xxdomain.net
+      command: sh /home/user/.sh/sh2.sh
 
+    - name: Wait until the string "Successfully enrolled machine in realm" is in the file /var/log/messages before continuing
+      wait_for:
+         path: /var/log/messages
+         search_regex: Successfully enrolled machine in realm
+
+    - name: Check AD Connection is done
+      ansible.builtin.shell: systemctl status sssd | grep "running" | wc -l
+      register: service_status
+
+    - name: Check AD Connection
+      ansible.builtin.debug:
+          msg: "AD integration completed"
+      when: service_status.stdout == "1"
+
+    - name: Delete .sh folder & File
+      file:
+        state: absent
+        path: /home/odeonuser/.sh/
+     
 
