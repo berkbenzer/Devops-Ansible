@@ -1,0 +1,26 @@
+### This .yaml deletes local user after checking AD configuration is done or not with confirming one of the AD user.
+
+---
+
+- hosts: initial_prod_test
+  become: true
+  become_user: root
+  vars:
+    username:
+      - 'xx1'
+      - 'xx2'
+
+
+  tasks:
+
+    - name: Check If AD linked
+      shell: id admtestuser | grep "adm"
+      register: ad_check
+
+    - name : Delete user
+      user:
+        name: '{{ item }}'
+        state: absent
+        remove: yes
+      loop: "{{ username }}"
+      when: ad_check.stdout.find('adm') != -1
