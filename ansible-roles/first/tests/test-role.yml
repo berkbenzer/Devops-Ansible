@@ -1,0 +1,9 @@
+---
+- name: Test my role
+  hosts: localhost
+
+  roles:
+
+    - role: first
+      become: true
+      become_user: root

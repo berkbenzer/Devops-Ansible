@@ -1,0 +1,13 @@
+---
+# tasks file for first
+  - name: Create default group
+  group:
+    name: "{{ first_default_group.name }}"
+    gid: "{{ first_default_group.gid }}"
+
+  - name: Create default user
+    user:
+      name: "{{ first_default_user.name }}"
+      uid: "{{ first_default_user.uid }}"
+      group: "{{ first_default_user.group }}"
+
