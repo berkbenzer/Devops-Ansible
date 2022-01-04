@@ -1,0 +1,11 @@
+---
+# vars file for multiple-userdel
+
+
+multiple-userdel_default_group:
+  name: rockstar
+  gid: 1100
+multiple-userdel_default_user:
+  name: rockstar
+  uid: 1100
+  group: rockstar

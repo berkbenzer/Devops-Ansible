@@ -1,0 +1,15 @@
+---
+# tasks file for multiple-userdel
+  - name: Create default group
+  group:
+    name: "{{ multiple-userdel_default_group.name }}"
+    gid: "{{ multiple-userdel_default_group.gid }}"
+
+- name: Create default user
+  user:
+    name: "{{ multiple-userdel_default_user.name }}"
+    uid: "{{ multiple-userdel_default_user.uid }}"
+    group: "{{ multiple-userdel_default_user.group }}"
+
+
+

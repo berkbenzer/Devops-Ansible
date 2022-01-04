@@ -1,6 +1,0 @@
-git status                                                        
-git add --all                                >>> to add new files
-git commit -m "hostname"                     >>> for creating desc
-git push origin master                       >>> to add master
-git branch installation_yamls                >>> for to add new branch
-git checkout -b new_branch existing_branch.  >>> create new branch from existing branch 

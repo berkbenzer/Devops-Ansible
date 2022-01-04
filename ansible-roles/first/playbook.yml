@@ -1,0 +1,8 @@
+---
+
+- name: Test my role
+
+  roles:
+    - role: first
+      become: true
+      become_user: root

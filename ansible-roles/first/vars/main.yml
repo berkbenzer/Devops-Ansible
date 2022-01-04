@@ -1,0 +1,11 @@
+---
+# vars file for first
+
+first_default_group:
+  name: rockstar
+  gid: 1100
+first_default_user:
+  name: rockstar
+  uid: 1100
+  group: rockstar
+

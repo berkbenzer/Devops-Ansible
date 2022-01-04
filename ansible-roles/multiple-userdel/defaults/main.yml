@@ -1,0 +1,10 @@
+---
+# defaults file for multiple-userdel
+
+
+multiple-userdel_default_packages
+  - tree
+  - vim
+multiple-userdel_remobe_packages: []
+
+
