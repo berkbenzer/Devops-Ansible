@@ -1,5 +1,0 @@
----
-
-- become: true
-  roles:
-    - role: multiple-userdel
