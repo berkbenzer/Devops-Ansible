@@ -1,0 +1,3 @@
+---
+
+- import_playbook: partition-blockdevice/blockdevice/playbook.yml
