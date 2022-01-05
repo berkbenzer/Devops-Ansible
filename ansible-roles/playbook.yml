@@ -1,3 +1,4 @@
 ---
 
 - import_playbook: partition-blockdevice/blockdevice/playbook.yml
+- import_playbook: multiple-userdel/playbook.yml
