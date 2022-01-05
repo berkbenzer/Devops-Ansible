@@ -1,5 +1,0 @@
-[userdel:children]
-userdel_app
-
-[userdel_app:children]
-app
